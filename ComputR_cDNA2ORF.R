@@ -342,3 +342,21 @@ printPairwiseAlignment <- function(alignment, chunksize=60, returnlist=FALSE)
     return(mylist)
   }
 }
+
+extractPositions <- function(probes, gene){
+  require(Biostrings)
+  
+  probe.pos = lapply(probes, function(x){
+    matchprobes(gene, x, probepos = T)
+  })
+  
+  probe.pos1 = lapply(probe.pos, function(x){
+    unlist(x$pos)
+  })
+  
+  probe.pos2 = unlist(probe.pos1, use.names = T)
+  
+  probe.pos3 = data.frame(probe = names(probe.pos2), pos = probe.pos2, row.names = NULL)
+  
+  return(probe.pos3)
+}

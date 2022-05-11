@@ -3,8 +3,6 @@ library(sangerseqR)
 library(tidyverse)
 
 data.import.ab1 <- function(pat= ".ab1", path = getwd(), names = c("none")){
-  require(sangerseqR)
-  
   data.files = list.files(pattern = pat, 
                           recursive = T, 
                           path = path)
@@ -26,7 +24,6 @@ data.import.ab1 <- function(pat= ".ab1", path = getwd(), names = c("none")){
 }
 
 data.import.scf <- function(pat = ".scf", path = getwd(), names = c("none")){
-  require(sangerseqR)
   
   data.files = list.files(pattern = pat, 
                           recursive = T, 

@@ -1,0 +1,3 @@
+wd <- gsub("PhD.*", "", getwd())
+dir <- paste0(wd, "PhD/Animals/Spp1_KO_validation/Alt_Transcripts")
+setwd(dir)

@@ -126,10 +126,8 @@ plot_gen <- function(dat, groups, pwc){
 }
 
 z_score <- function(data.tab, value){
-  x = data.tab[value]
-  
   dat = data.tab %>%
-    mutate_at(vars(value), funs(z = (. - min(x)) / (max(x) - min(x))))
+    mutate_at(vars(value), funs(z = (. - min(.)) / (max(.) - min(.))))
   
   return(dat)
 }

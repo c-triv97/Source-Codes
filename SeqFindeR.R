@@ -42,6 +42,10 @@ get_sequence <- function(seq_ids, type){
   return(seq$seq)
 }
 
+library(stringi)
 
+reverseComp <- function(seq){
+  return(stri_reverse(chartr("acgtACGT", "tgcaTGCA", Seq)))
+}
 
 

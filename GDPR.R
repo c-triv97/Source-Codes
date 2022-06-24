@@ -18,3 +18,5 @@ find_files <- function(pat, replace, path, sep, skip){
   
   return(data)
 }
+
+standard_error <- function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x))) 

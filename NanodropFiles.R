@@ -29,3 +29,18 @@ load.files = function(pattern, sep = "\t",
   
   return(tables2)
 }
+
+# calculate volumes for reactions 
+
+VolNucleicAcids = function(samples, 
+                           C1, 
+                           V1){ # samples is a list of concentrations from the nanodrop, C1 is the desired concentration and V1 is the desired reaction volume
+  x = list()
+  
+  for (i in 1:length(samples)){
+    
+    x[[i]] = (C1 * V1)/ samples[[i]] 
+  }
+  
+  return(x) 
+}

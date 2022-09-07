@@ -7,7 +7,7 @@ data.import.ab1 <- function(pat= ".ab1", path = getwd(), names = c("none")){
                           recursive = T, 
                           path = path)
   data = lapply(data.files, function(x){
-    read.abif(paste(path, x, sep = ""))
+    sangerseqR::read.abif(paste(path, x, sep = ""))
   })
   
   data = lapply(data, function(x){

@@ -167,7 +167,7 @@ data_import <- function(pat, plate.dat, replicates, path=getwd()){
   return(data.list)
 }
  
-fit2curve <- function(summary.dat, standards, samples, DF, tissue, ug, vol){
+fit2curve <- function(summary.dat, standards, samples, DF, sample_type, ug, vol){
 
   standard_curve = subset(summary.dat, 
                            value %in% standards) #subsetting a table to use for standard curve generation
@@ -193,7 +193,7 @@ fit2curve <- function(summary.dat, standards, samples, DF, tissue, ug, vol){
   
   sample_data = final_conc(sample_data, 
                            df = DF, 
-                           paste(tissue))  # applying dilution factor and annotating with some more sample information 
+                           paste(sample_type))  # applying dilution factor and annotating with some more sample information 
   
   #generating required ul for given ug and diluent for given uL total volume excluding SDS sample buffer  
   sample_data = western_vols(sample_data, 

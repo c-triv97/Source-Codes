@@ -1,4 +1,5 @@
 # functions for performing calculations from echo measurements in imageJ 
+library(tidyverse)
 
 calc_hr <- function(dat, animal_id, msec = 1286.67){  #dat is table containing ID and number of peaks per image
   dat %>%

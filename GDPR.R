@@ -23,7 +23,7 @@ standard_error <- function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x)))
 
 wd <- function(file_path, sub){
   wd = gsub(sub, "", getwd())
-  dir =  paste0(wd, file_path)
+  dir =  paste0(wd, file_path, sep = "")
   setwd(dir)
 }
 

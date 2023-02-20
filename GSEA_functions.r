@@ -44,6 +44,12 @@ goseq_object <- function(data,
                 scale_color_viridis_c()
 
         print(plot)
+        ggsave(plot, filename = paste0("plots/",
+                                       comparison,
+                                       i,
+                                       ".pdf", 
+                                       sep = ""),
+               width = 16)
 
         goResults[[i]] = results
     }

@@ -39,7 +39,7 @@ goseq_object <- function(data,
                     color = "p value",
                     size = "count", 
                     subtitle = comparison)+
-                theme_pubr(base_size = 16, legend = "right") +
+                theme_pubr(base_size = 18, legend = "right") +
                 scale_size_continuous(range = c(10, 20))+
                 scale_color_viridis_c()
 
@@ -49,10 +49,112 @@ goseq_object <- function(data,
                                        i,
                                        ".pdf", 
                                        sep = ""),
-               width = 16)
+               width = 12)
 
         goResults[[i]] = results
     }
 
     return(goResults)
+}
+
+fgsea_output <- function(dataframe, pathways, filename){
+
+    gseaDat = dataframe
+
+    ranks = gseaDat$logFC
+
+    names(ranks) = gseaDat$entrezgene_id
+
+    fgseaRes = fgsea::fgsea(pathways,
+                            ranks, 
+                            minSize = 15,
+                            maxSize = 500)
+
+    write.table(fgseaRes, file = paste0(filename, "fgsea.txt"), sep = "\t",
+                row.names = FALSE)
+
+    top10up = fgseaRes %>%
+                filter(ES > 0) %>%
+                top_n(10, wt = -padj)
+    
+    top10down = fgseaRes %>%
+                filter(ES < 0) %>%
+                top_n(10, wt = -padj)
+
+    all = bind_rows(top10up, top10down)
+
+    plot = ggplot(all, aes(y = pathway, x = NES, size = size)) +
+        geom_point(alpha = 0.6, aes(color = padj)) +
+        guides(size = guide_legend(ncol = 1),
+            color = "none") +
+        theme_pubr(legend = "right") +
+        scale_size_continuous(range = c(5, 10)) +
+        scale_color_continuous()
+
+    print(plot)
+
+    return(fgseaRes)
+}
+
+gse_clusterprofiler <- function(data, 
+                                organism,
+                                keys = "ENSEMBL",
+                                padj = "BH",
+                                printplot = TRUE){
+    if (is.data.frame(data)){
+        genes <- data$logFC
+        names(genes) <- data$ensembl_gene_id
+    } else {
+        print(head(data))
+    }
+
+    gse = gseGO(geneList = data,
+                    ont = "ALL",
+                    keyType = keys,
+                    minGSSize = 3,
+                    maxGSSize = 800,
+                    pvalueCutoff = 0.5,
+                    verbose = TRUE,
+                    OrgDb = organism,
+                    pAdjustMethod = padj, 
+                    eps = 0)
+    
+    if (printplot == TRUE){
+        plot = dotplot(gse, showCategory = 10, split = ".sign") +
+                        facet_grid(~.sign)+
+                        theme_bw(base_size = 18)
+        print(plot)
+    }
+    return(gse)
+}
+
+kegg_clusterprofiler <- function(data, # input needs to have entrez ids 
+                                 keys = "ncbi-geneid",
+                                 organism = "mmu",
+                                 padj = "BH",
+                                 printplot = TRUE){
+    if (is.data.frame(data)){
+        dat <- data$logFC
+        names(dat) <- data$entrezgene_id
+    } else {
+        print(head(data))
+        dat = data
+    }
+
+    gse <- gseKegg(geneList = dat, 
+                   organism = organism, 
+                   nPerm = 10000, 
+                   minGSSize = 3, 
+                   maxGSSize = 800, 
+                   pvalueCutoff = 0.5, 
+                   pAdjustMethod = padj, 
+                   keyType = keys)
+    
+    if (printplot == TRUE){
+        plot = dotplot(gse, showCategory = 10, split = ".sign", orderBy = "p.adjust") +
+                        theme_bw(base_size = 18)
+        print(plot)
+    }
+
+    return(gse)
 }

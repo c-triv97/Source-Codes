@@ -80,3 +80,10 @@ myVolcano <- function(dataframe, title, logcutoff) {
             scale_x_continuous(limits = c(-10, +15))
         return(plot)
 }
+
+geneset_enrichment <- function(data, 
+                               topn=10,
+                               genome="mm"){
+        entrezid =
+
+}

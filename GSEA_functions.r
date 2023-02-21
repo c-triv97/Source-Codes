@@ -141,7 +141,7 @@ kegg_clusterprofiler <- function(data, # input needs to have entrez ids
         dat = data
     }
 
-    gse <- gseKegg(geneList = dat, 
+    gse <- gseKEGG(geneList = dat, 
                    organism = organism, 
                    nPerm = 10000, 
                    minGSSize = 3, 

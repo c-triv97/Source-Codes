@@ -113,7 +113,7 @@ gse_clusterprofiler <- function(data,
                     keyType = keys,
                     minGSSize = 3,
                     maxGSSize = 800,
-                    pvalueCutoff = 0.5,
+                    pvalueCutoff = 0.05,
                     verbose = TRUE,
                     OrgDb = organism,
                     pAdjustMethod = padj, 
@@ -141,13 +141,13 @@ kegg_clusterprofiler <- function(data, # input needs to have entrez ids
         dat = data
     }
 
-    gse <- gseKEGG(geneList = dat, 
-                   organism = organism, 
-                   nPerm = 10000, 
-                   minGSSize = 3, 
-                   maxGSSize = 800, 
-                   pvalueCutoff = 0.5, 
-                   pAdjustMethod = padj, 
+    gse <- gseKEGG(geneList = dat,
+                   organism = organism,
+                   nPerm = 10000,
+                   minGSSize = 3,
+                   maxGSSize = 800,
+                   pvalueCutoff = 0.05,
+                   pAdjustMethod = padj,
                    keyType = keys)
     
     if (printplot == TRUE){
@@ -157,4 +157,42 @@ kegg_clusterprofiler <- function(data, # input needs to have entrez ids
     }
 
     return(gse)
+}
+
+plotting_common <- function(datalist, comparison_groups, order, save = FALSE){
+
+    GOlist <- lapply(datalist[c(comparison_groups)], function(x){
+        go_ids = x$ID %>%
+            droplevels()
+        return(go_ids)
+    })
+
+    inCommon <- Reduce(intersect, GOlist)
+
+    dat <- rbindlist(datalist[c(comparison_groups)], idcol = "comparison") %>%
+            dplyr::mutate(InCommon = ifelse(ID %in% inCommon, TRUE, FALSE))
+    
+    colors = c("FALSE" = "#636363", "TRUE" = "#1f78b4")
+
+    ggplot(dat %>%
+        group_by(comparison) %>%
+        arrange(pvalue) %>%
+        slice_head(n = 10)) +
+        geom_point(aes(x = NES, y = Description, size = pvalue,
+                        color = InCommon),
+                alpha = 0.6) +
+        facet_grid(~ factor(comparison, levels = c(order))) +
+        geom_vline(xintercept = 0, color = "red") +
+        scale_size_continuous(range = c(10, 5)) +
+        scale_color_manual(values = colors) +
+        theme_bw(base_size = 18) +
+        labs(subtitle = "Top 10 most significantly enriched GO terms in each comparison group", 
+            caption = "TRUE = term is in common between two or more, FALSE = term is unique to comparison")
+    
+    print(last_plot())
+
+    return(dat)
+
+    if (save == TRUE)
+    ggsave(last_plot(), filename = "comparison_plot.pdf", height = 12, widht = 8)
 }

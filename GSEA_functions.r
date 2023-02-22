@@ -159,7 +159,7 @@ kegg_clusterprofiler <- function(data, # input needs to have entrez ids
     return(gse)
 }
 
-plotting_common <- function(datalist, comparison_groups, order, save = FALSE){
+plotting_common <- function(datalist, comparison_groups, order, save = FALSE, n=10){
 
     GOlist <- lapply(datalist[c(comparison_groups)], function(x){
         go_ids = x$ID %>%
@@ -171,23 +171,16 @@ plotting_common <- function(datalist, comparison_groups, order, save = FALSE){
 
     dat <- rbindlist(datalist[c(comparison_groups)], idcol = "comparison") %>%
             dplyr::mutate(InCommon = ifelse(ID %in% inCommon, TRUE, FALSE))
-    
-    colors = c("FALSE" = "#636363", "TRUE" = "#1f78b4")
 
     ggplot(dat %>%
         group_by(comparison) %>%
-        arrange(pvalue) %>%
-        slice_head(n = 10)) +
-        geom_point(aes(x = NES, y = Description, size = pvalue,
-                        color = InCommon),
+        arrange(p.adjust) %>%
+        slice_head(n = n)) +
+        geom_point(aes(x = -log(p.adjust), y = Description, size = NES,
+                        color = comparison),
                 alpha = 0.6) +
-        facet_grid(~ factor(comparison, levels = c(order))) +
-        geom_vline(xintercept = 0, color = "red") +
-        scale_size_continuous(range = c(10, 5)) +
-        scale_color_manual(values = colors) +
-        theme_bw(base_size = 18) +
-        labs(subtitle = "Top 10 most significantly enriched GO terms in each comparison group", 
-            caption = "TRUE = term is in common between two or more, FALSE = term is unique to comparison")
+        theme_bw(base_size = 20) +
+        labs(subtitle = "Top 10 most significantly enriched GO terms in each comparison group")
     
     print(last_plot())
 

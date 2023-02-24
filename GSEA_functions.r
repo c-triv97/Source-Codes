@@ -3,7 +3,14 @@ library(biomaRt)
 library(ggplot2)
 library(ggpubr)
 library(clusterProfiler)
+library(GOSemSim)
 
+SemSimData <- function(organism, ont="BP"){
+
+    SemSim = godata(organism, ont = ont)
+
+    return(SemSim)
+}
 
 gse_clusterprofiler <- function(data, 
                                 organism,

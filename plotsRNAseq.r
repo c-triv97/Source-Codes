@@ -81,9 +81,3 @@ myVolcano <- function(dataframe, title, logcutoff) {
         return(plot)
 }
 
-geneset_enrichment <- function(data, 
-                               topn=10,
-                               genome="mm"){
-        entrezid =
-
-}

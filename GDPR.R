@@ -29,6 +29,8 @@ wd <- function(file_path, sub){
 
 `%!in%` <- negate(`%in%`)
 
+library(ggpubr)
+llibrary(ggplot2)
 theme_thesis <-  theme_pubr(base_size = 18) + theme(
     panel.background = element_rect(fill='transparent'),
     plot.background = element_rect(fill='transparent', color=NA),

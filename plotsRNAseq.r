@@ -12,13 +12,13 @@ myMAplot <- function(data, title) {
                          arrange((abs(padj))) %>%
                          dplyr::slice(1:10))
         
-        top_genes <- getBM(filters = "ensembl_transcript_id",
-                       attributes = c("external_transcript_name", 
-                                      "ensembl_transcript_id"),
+        top_genes <- getBM(filters = "ensembl_gene_id",
+                       attributes = c("external_gene_name", 
+                                      "ensembl_gene_id"),
                        values = top_n, mart = ensembl)%>%
-                mutate(external_transcript_name = case_when(external_transcript_name == ""  ~
-                       ensembl_transcript_id,
-                       TRUE ~ external_transcript_name))
+                mutate(external_gene_name = case_when(external_gene_name == ""  ~
+                       ensembl_gene_id,
+                       TRUE ~ external_gene_name))
 
         top_n <- merge(top_genes, dat, by.x = 2, by.y = 0)
 
@@ -29,7 +29,7 @@ myMAplot <- function(data, title) {
             geom_point(alpha = 0.6, size = 3)+
             geom_line(aes(y = 0), color = "black", linewidth = 2) +
             geom_label_repel(data = top_n, 
-                             aes(label = external_transcript_name),
+                             aes(label = external_gene_name),
                              show.legend = FALSE,
                              max.overlaps = Inf,
                              nudge_x = 1,
@@ -65,11 +65,11 @@ myVolcano <- function(dataframe, title, logcutoff) {
                       aes(x = log2FoldChange, y = logpadj, color = sig)) +
             geom_point(alpha = 0.6, size = 3) +
             geom_label_repel(data = top_up,
-                             aes(label = external_transcript_name),
+                             aes(label = external_gene_name),
                              show.legend = FALSE,
                              max.overlaps = Inf) +
             geom_label_repel(data = top_down,
-                             aes(label = external_transcript_name),
+                             aes(label = external_gene_name),
                              show.legend = FALSE,
                              max.overlaps = Inf) +
             theme_pubr(base_size = 16, legend = "right") +

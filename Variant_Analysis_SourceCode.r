@@ -50,7 +50,10 @@ extract_basic_info <- function(VCF_obj, sample_name) {
     return(list(p1, p2, p3))
 }
 
-extracting_het <- function(VCF_obj){
+extracting_variants <- function(VCF_obj) {
+
+    genotype <- geno(VCF_obj)$GT
+
     dat <- as.data.frame(genotype) %>%
                   mutate(genotype = str_replace(genotype,
                   pattern = "/",
@@ -72,8 +75,21 @@ extracting_het <- function(VCF_obj){
     varTab1$refBase <- as.character(ref_base)
 # alt alleles are retrieved from alt(vcf)
     alt_base <- alt(VCF_obj)[rownames(VCF_obj) %in% var_1]
-    alt_base <- lapply(alt_base, function(x){ as.character(x)} ) #this takes time 
-    varTab1$altBase <- unlist(alt_base)
-            
+    alt_base = CharacterList(alt_base)
+    alt_base = unstrsplit(alt_base, sep = ",")
+    varTab1$altBase <- alt_base
+#extract counts from AD 
+    adCount <- geno(VCF_obj)$AD[rownames(geno(VCF_obj)$AD) %in% var_1]
+    varTab1$refCount <- unlist(lapply(adCount,`[[`,1))
+    varTab1$altCount <- unlist(lapply(adCount,`[[`,2))
+# extracting genotype and phred quality score  
+    varTab1$genoType <- geno(VCF_obj)$GT[rownames(geno(VCF_obj)$GT) %in% var_1]
+    varTab1$gtQuality <- geno(VCF_obj)$GQ[rownames(geno(VCF_obj)$GQ) %in% var_1]
+
+    annotation <- info(VCF_obj)
+
+    varTab1 <- merge(varTab1, annotation, by.x = "variant", by.y = 0)
+
+    return(varTab1)
 
 }

@@ -3,6 +3,11 @@ library(ggplot2)
 library(stringr)
 library(tidyverse)
 
+# Transition (Ti)
+ti <- c("A>G","G>A","C>T","T>C")
+# Transveersion (Tv)
+tv <- c("A>T","A>C","G>T","G>C","C>A","C>G","T>A","T>G")
+
 extract_basic_info <- function(VCF_obj, sample_name) {
     
     genotype <- geno(VCF_obj)$GT
@@ -85,6 +90,16 @@ extracting_variants <- function(VCF_obj) {
 # extracting genotype and phred quality score  
     varTab1$genoType <- geno(VCF_obj)$GT[rownames(geno(VCF_obj)$GT) %in% var_1]
     varTab1$gtQuality <- geno(VCF_obj)$GQ[rownames(geno(VCF_obj)$GQ) %in% var_1]
+
+    varTab1 <- varTab1 %>% 
+            dplyr::mutate(mutType = case_when(nchar(refBase) < nchar(altBase) ~ "INS",
+                               nchar(refBase) > nchar(altBase) ~ "DEL",
+								               nchar(refBase) == 1 & nchar(altBase) == 1 ~ "SNP",
+                               TRUE ~ "Other")) %>%
+            dplyr::mutate(nuSub = paste0(refBase,">",altBase)) %>%
+            dplyr::mutate(TiTv = case_when(nuSub %in% ti ~ "Ti",
+                                        nuSub %in% tv ~ "Tv",
+                                        TRUE ~ NA))
 
     annotation <- info(VCF_obj)
 

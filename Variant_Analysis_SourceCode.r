@@ -49,23 +49,27 @@ extract_basic_info <- function(VCF_obj, sample_name) {
 
     p3 <- ggplot(as.data.frame(GQ), aes(x=Sample)) +
         geom_histogram(fill = "blue", alpha = 0.6) +
-        labs(x = "", y = "Counts", caption = paste0(sample_name, "phred score (genotype calling quality)")) +
+        labs(x = "", y = "Counts", caption = paste0(sample_name, ": GQ score (phred-scaled)")) +
         theme_light(base_size = 22)
     
     return(list(p1, p2, p3))
 }
 
-extracting_variants <- function(VCF_obj) {
+extracting_variants <- function(VCF_obj, save.file=FALSE, file="vcf.csv") {
 
     genotype <- geno(VCF_obj)$GT
 
     dat <- as.data.frame(genotype) %>%
-                  mutate(genotype = str_replace(genotype,
-                  pattern = "/",
-                  replacement = "|"))
+           tibble::rownames_to_column(var = "variant") %>% 
+            dplyr::rename(genotype = 2) %>%
+            dplyr::mutate(genotype = str_replace(genotype,
+                          pattern = "/",
+                          replacement = "|"))
 
-    var_1 <- rownames(dat)[
-    dat$genotype=="1|1"]
+    var_1 <- dplyr::filter(dat, 
+                           genotype == "1|1") %>%
+             dplyr::pull("variant")
+    
 
     variant_info <- rowRanges(VCF_obj) #extract GRanges obj from the VCF object 
 # extract info 
@@ -88,7 +92,7 @@ extracting_variants <- function(VCF_obj) {
     varTab1$refCount <- unlist(lapply(adCount,`[[`,1))
     varTab1$altCount <- unlist(lapply(adCount,`[[`,2))
 # extracting genotype and phred quality score  
-    varTab1$genoType <- geno(VCF_obj)$GT[rownames(geno(VCF_obj)$GT) %in% var_1]
+    varTab1$genotype <- geno(VCF_obj)$GT[rownames(geno(VCF_obj)$GT) %in% var_1]
     varTab1$gtQuality <- geno(VCF_obj)$GQ[rownames(geno(VCF_obj)$GQ) %in% var_1]
 
     varTab1 <- varTab1 %>% 
@@ -99,12 +103,17 @@ extracting_variants <- function(VCF_obj) {
             dplyr::mutate(nuSub = paste0(refBase,">",altBase)) %>%
             dplyr::mutate(TiTv = case_when(nuSub %in% ti ~ "Ti",
                                         nuSub %in% tv ~ "Tv",
-                                        TRUE ~ NA))
+                                        TRUE ~ NA)) %>%
+            dplyr::mutate(genotype = str_replace(genotype,
+                                      pattern = "/",
+                                      replacement = "|"))
 
-    annotation <- info(VCF_obj)
-
-    varTab1 <- merge(varTab1, annotation, by.x = "variant", by.y = 0)
-
+    if(save.file == TRUE) {
+        write.csv(varTab1, file=file,
+                  quote = FALSE,
+                  row.names = FALSE)
+    }
+    
     return(varTab1)
 
 }

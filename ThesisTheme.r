@@ -1,5 +1,4 @@
-cran.packages <- c(cran.packages, 
-                   "tidyverse",
+cran.packages <- c("tidyverse",
                    "ggplot2",
                    "ggrepel",
                    "RColorBrewer",

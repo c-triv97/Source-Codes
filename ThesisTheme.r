@@ -11,7 +11,21 @@ cran.packages <- c("tidyverse",
                    "ggpubr",
                    "ggprism"
 )
-lapply(cran.packages, require2, character.only = TRUE)
+
+packages.load <- function(x) {
+  if(require(x)){
+    print(paste(x, " is loaded correctly"))
+} else {
+    print(paste(x, " is trying to install"))
+    install.packages(x)
+    if(require(x)){
+        print(paste(x, " is installed and loaded"))
+    } else {
+        stop("could not install")
+    }
+}
+              
+lapply(cran.packages, packages.load, character.only = TRUE)
 
 theme_thesis <-  theme_light(base_size = 18) + theme(
     panel.background = element_rect(fill='transparent'),

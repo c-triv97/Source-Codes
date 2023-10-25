@@ -26,7 +26,7 @@ tx2gene <- as.data.frame(txs) %>%
            relocate("tx_id_version", "gene_id") 
 
 
-pca_full <- function(dds, trans = "rlog", title = "", info, anno){ # info should be df with sample id and condition 
+pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadings"){ # info should be df with sample id and condition, anno is gene id matching dds plus common symbol, keep decides keeping loading plot or the PCA output object (for recreating any plot)
     dds = dds 
 
     colnames(info) = c("sample", "condition")
@@ -124,6 +124,12 @@ pca_full <- function(dds, trans = "rlog", title = "", info, anno){ # info should
                         subtitle = paste0("PC loading plot", title, sep = ""))
     
     print(loading_plot)
+
+    if (keep == "loadings"){
+        return(loading_plot)
+    } else {
+        return(pca)
+    }
 
 }
 ## MA Plots R

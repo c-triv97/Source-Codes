@@ -98,8 +98,9 @@ pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadin
                  select(gene, PC1, PC2) %>% # convert to a "long" format
                  pivot_longer(matches("PC"), names_to = "PC", values_to = "loading") %>% # for each PC
                  group_by(PC) %>%  # arrange by descending order of loading
-                 slice_max(loading, n = 10) %>% # take the 10 top rows
-                 pull("gene")  %>% # pull the gene column as a vector
+                 arrange(desc(abs(loading))) %>% 
+                 slice(1:10) %>% # take the 10 top rows
+                 pull("gene") %>% # pull the gene column as a vector
                  unique() # ensure only unique genes are retained
 
     annotation = gxs %>% 

@@ -99,7 +99,7 @@ pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadin
                  pivot_longer(matches("PC"), names_to = "PC", values_to = "loading") %>% # for each PC
                  group_by(PC) %>%  # arrange by descending order of loading
                  arrange(desc(abs(loading))) %>% 
-                 slice(1:10) %>% # take the 10 top rows
+                 slice_head(n=10) %>% # take the 10 top rows
                  pull("gene") %>% # pull the gene column as a vector
                  unique() # ensure only unique genes are retained
 
@@ -118,11 +118,16 @@ pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadin
                                 color = "blue", alpha = 0.8, linewidth = 2) +
                     geom_label_repel(aes(x = PC1, y = PC2, label = gene_name), size = 4, max.overlaps = Inf) +
                     theme_thesis + 
-                    scale_x_continuous(limits = c(min(top_loadings$PC1), max(top_loadings$PC1))) +
-                    scale_y_continuous(limits = c(min(top_loadings$PC2), max(top_loadings$PC2))) +
+                    scale_x_continuous(guide = "prism_minor",
+                                       limits = c(min(top_loadings$PC1)-0.01, 
+                                                  max(top_loadings$PC1)+0.01))+
+                    scale_y_continuous(guide = "prism_minor",
+                                       limits = c(min(top_loadings$PC2)-0.01, 
+                                                  max(top_loadings$PC2)+0.01))+
                     labs(x = paste0("PC1 (", round(eigenvalues$pct[1],1), "%)", sep=""), 
                         y = paste0("PC2 (", round(eigenvalues$pct[2],1), "%)", sep=""), 
                         subtitle = paste0("PC loading plot", title, sep = ""))
+    
     
     print(loading_plot)
 
@@ -175,7 +180,7 @@ myMAplot <- function(data, title) {
         return(plot)
 }
 
-myVolcano <- function(dataframe, title, logcutoff) {
+myVolcano <- function(dataframe, title, logcutoff, n=10) {
 
         dat = dataframe %>%
                 dplyr::mutate(sig = ifelse(padj < .05 & log2FoldChange > logcutoff, "UP", 
@@ -185,31 +190,56 @@ myVolcano <- function(dataframe, title, logcutoff) {
 
         top_up = subset(dat, sig == "UP") %>%
                 dplyr::arrange((abs(padj))) %>%
-                dplyr::slice(1:5)
+                dplyr::slice(1:n)
         
         top_down = subset(dat, sig == "DOWN") %>%
                 dplyr::arrange((abs(padj))) %>%
-                dplyr::slice(1:5)
+                dplyr::slice(1:n)
         
         colors = c("NS" = "#636363", "UP" = "#66c2a5", "DOWN" = "#fc8d62")
 
         plot = ggplot(dat,
                       aes(x = log2FoldChange, y = logpadj, color = sig)) +
-            geom_point(alpha = 0.6, size = 3) +
-            geom_label_repel(data = top_up,
+            geom_point(alpha = 0.6, size = 4) +
+            geom_text_repel(data = top_up,
                              aes(label = external_gene_name),
                              show.legend = FALSE,
-                             max.overlaps = Inf) +
-            geom_label_repel(data = top_down,
+                             color = "black", 
+                             max.overlaps = 5) +
+            geom_text_repel(data = top_down,
                              aes(label = external_gene_name),
                              show.legend = FALSE,
-                             max.overlaps = Inf) +
-            theme_pubr(base_size = 16, legend = "right") +
+                             color = "black", 
+                             max.overlaps = 5) +
+            theme_thesis + 
             scale_color_manual(values = colors) +
             labs(subtitle = title,
                  y = "padj (-log10)",
-                 x = "Fold Change (log2)") +
-            scale_x_continuous(limits = c(-10, +15))
+                 x = "Log2 Fold Change") +
+            scale_x_continuous(guide = "prism_minor", 
+                               expand = c(0,0), 
+                               limits = c(min(dat$log2FoldChange)-0.1,
+                                          max(dat$log2FoldChange)+0.1)) +
+            scale_y_continuous(guide = "prism_minor", 
+                               limits = c(min(dat$logpadj)-1,
+                                          max(dat$logpadj)+1)) +
+            geom_vline(xintercept = logcutoff, 
+                    linetype = "dashed", 
+                    colour = "grey", 
+                    linewidth = 1.5, 
+                    alpha = 0.5) +
+            geom_vline(xintercept = -logcutoff, 
+                    linetype = "dashed", 
+                    colour = "grey", 
+                    linewidth = 1.5, 
+                    alpha = 0.5) +
+            geom_hline(yintercept = -log10(0.05), 
+                    linetype = "dashed", 
+                    linewidth = 1.5,
+                    alpha = 0.5,  
+                    color = "grey") +
+            guides(color = "none")
+    
         return(plot)
 }
 

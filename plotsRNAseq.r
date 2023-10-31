@@ -292,3 +292,15 @@ myVolcano_unlabelled <- function(dataframe, title, logcutoff) {
         return(plot)
 }
 
+make_bold_names <- function(mat, rc_fun, rc_names) { ### rc_fun will be "colnames" or "rownames" depending. mat is the data to make the heatmap. rc_name is vector of names to be bold 
+  bold_names <- rc_fun(mat)
+  ids <- rc_names %>% match(rc_fun(mat))
+  ids %>%
+    walk(
+      function(i)
+        bold_names[i] <<-
+        bquote(bold(.(rc_fun(mat)[i]))) %>%
+        as.expression()
+    )
+  bold_names
+} 

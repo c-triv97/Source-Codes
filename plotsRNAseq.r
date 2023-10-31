@@ -256,16 +256,6 @@ myVolcano_unlabelled <- function(dataframe, title, logcutoff) {
         plot = ggplot(dat,
                       aes(x = log2FoldChange, y = logpadj, color = sig)) +
             geom_point(alpha = 0.6, size = 4) +
-            geom_text_repel(data = top_up,
-                             aes(label = external_gene_name),
-                             show.legend = FALSE,
-                             color = "black", 
-                             max.overlaps = 5) +
-            geom_text_repel(data = top_down,
-                             aes(label = external_gene_name),
-                             show.legend = FALSE,
-                             color = "black", 
-                             max.overlaps = 5) +
             theme_thesis + 
             scale_color_manual(values = colors) +
             labs(subtitle = title,

@@ -243,3 +243,58 @@ myVolcano <- function(dataframe, title, logcutoff, n=10) {
         return(plot)
 }
 
+myVolcano_unlabelled <- function(dataframe, title, logcutoff) {
+
+        dat = dataframe %>%
+                dplyr::mutate(sig = ifelse(padj < .05 & log2FoldChange > logcutoff, "UP", 
+        ifelse(padj < .05 & log2FoldChange < -logcutoff, "DOWN", "NS")),
+        padj = dplyr::case_when(padj == 0 ~ 1e-307, TRUE ~ padj),
+        logpadj = -log10(padj))
+        
+        colors = c("NS" = "#636363", "UP" = "#66c2a5", "DOWN" = "#fc8d62")
+
+        plot = ggplot(dat,
+                      aes(x = log2FoldChange, y = logpadj, color = sig)) +
+            geom_point(alpha = 0.6, size = 4) +
+            geom_text_repel(data = top_up,
+                             aes(label = external_gene_name),
+                             show.legend = FALSE,
+                             color = "black", 
+                             max.overlaps = 5) +
+            geom_text_repel(data = top_down,
+                             aes(label = external_gene_name),
+                             show.legend = FALSE,
+                             color = "black", 
+                             max.overlaps = 5) +
+            theme_thesis + 
+            scale_color_manual(values = colors) +
+            labs(subtitle = title,
+                 y = "padj (-log10)",
+                 x = "Log2 Fold Change") +
+            scale_x_continuous(guide = "prism_minor", 
+                               expand = c(0,0), 
+                               limits = c(min(dat$log2FoldChange)-0.1,
+                                          max(dat$log2FoldChange)+0.1)) +
+            scale_y_continuous(guide = "prism_minor", 
+                               limits = c(min(dat$logpadj)-1,
+                                          max(dat$logpadj)+1)) +
+            geom_vline(xintercept = logcutoff, 
+                    linetype = "dashed", 
+                    colour = "grey", 
+                    linewidth = 1.5, 
+                    alpha = 0.5) +
+            geom_vline(xintercept = -logcutoff, 
+                    linetype = "dashed", 
+                    colour = "grey", 
+                    linewidth = 1.5, 
+                    alpha = 0.5) +
+            geom_hline(yintercept = -log10(0.05), 
+                    linetype = "dashed", 
+                    linewidth = 1.5,
+                    alpha = 0.5,  
+                    color = "grey") +
+            guides(color = "none")
+    
+        return(plot)
+}
+

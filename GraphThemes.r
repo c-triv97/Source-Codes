@@ -16,7 +16,7 @@ pacman::p_load(cran.packages, character.only = TRUE)
               
 #lapply(cran.packages, packages.load, character.only = TRUE)
 
-theme_thesis <-  theme_light(base_size = 18) + theme(
+theme_scientific <-  theme_light(base_size = 18) + theme(
     panel.background = element_rect(fill='transparent'),
     plot.background = element_rect(fill='transparent', color=NA),
     prism.ticks.length.y = unit(4, "pt"), 

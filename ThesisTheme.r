@@ -21,5 +21,14 @@ theme_thesis <-  theme_light(base_size = 18) + theme(
     plot.background = element_rect(fill='transparent', color=NA),
     prism.ticks.length.y = unit(4, "pt"), 
     strip.background = element_rect(fill = "transparent"), 
-    strip.text = element_text(color = "black", size = 18, face = "bold.italic"), 
+    strip.text = element_text(color = "black", size = 18, face = "bold.italic"),
+    panel.spacing = unit(2, "lines"))
+
+theme_thesis2 <-  theme_light(base_size = 18) + theme(
+    panel.background = element_rect(fill='transparent'),
+    plot.background = element_rect(fill='transparent', color=NA),
+    prism.ticks.length.y = unit(4, "pt"), 
+    strip.background = element_rect(fill = "transparent"), 
+    strip.text = element_text(color = "black", size = 18, face = "bold.italic"),
+    panel.border = element_blank(),
     panel.spacing = unit(2, "lines"))

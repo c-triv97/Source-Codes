@@ -31,4 +31,5 @@ theme_thesis2 <-  theme_light(base_size = 18) + theme(
     strip.background = element_rect(fill = "transparent"), 
     strip.text = element_text(color = "black", size = 18, face = "bold.italic"),
     panel.border = element_blank(),
+    axis.line = element_line(colour = "black"),
     panel.spacing = unit(2, "lines"))

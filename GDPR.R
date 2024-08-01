@@ -40,4 +40,6 @@ multiplesheets <- function(fname) {
     
   # assigning names to data frames 
   names(data_frame) <- sheets 
+
+  return(data_frame) 
 } 

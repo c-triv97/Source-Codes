@@ -28,3 +28,18 @@ wd <- function(file_path, sub){
 }
 
 `%!in%` <- negate(`%in%`)
+
+# reading multiple excel sheets
+require("readxl") 
+multiplesheets <- function(fname) { 
+   
+  # getting info about all excel sheets 
+  sheets <- readxl::excel_sheets(fname) 
+  tibble <- lapply(sheets, function(x) readxl::read_excel(fname, sheet = x)) 
+  data_frame <- lapply(tibble, as.data.frame) 
+    
+  # assigning names to data frames 
+  names(data_frame) <- sheets 
+
+  return(data_frame) 
+} 

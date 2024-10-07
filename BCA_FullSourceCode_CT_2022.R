@@ -207,10 +207,3 @@ fit2curve <- function(summary.dat, standards, samples, DF, sample_type, ug, vol)
   
   return(list.model)
 }
-
-  
-  
-  
-  
-  
-  

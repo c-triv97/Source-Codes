@@ -157,8 +157,14 @@ fit2curve <- function(standards, unknowns, plt = TRUE){
 
 western_vols <- function(data, 
                          ug, 
-                         vol){
-  data %>%
-    mutate(`vol req (uL)` = (ug / (`final conc (ug/ml)` / 1) * 1000))%>%
-    mutate(`diluent (uL)` = vol - `vol req (uL)`)
+                         vol,
+                         sb=5){
+  sb.ul = vol/sb 
+  
+  out = data %>%
+    mutate(vol.req.ul = (ug / (`estimate` / 1) * 1000))%>%
+    mutate(diluent.ul = vol - vol.req.ul - sb.ul, 
+           sb.ul = sb.ul)
+
+  return(out)
 }

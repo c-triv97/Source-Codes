@@ -8,7 +8,7 @@ pacman::p_load(cran.packages, character.only = TRUE) # pacman looks for the pack
 source("https://raw.githubusercontent.com/c-triv97/Source-Codes/main/GDPR.R") # this is some general functions "General Data PRocessing" I have for things like standard error which are missing from base R 
 source("https://raw.githubusercontent.com/c-triv97/Source-Codes/main/GraphThemes.r") # this is a theme for ggplot that I use 
 
-data_import <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|B|C", nstd=3, nspl=3){
+data_import <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|B|C", nstd=3, nspl=3, nrow = 50){
   
     data.file = list.files(
         pattern = pat,

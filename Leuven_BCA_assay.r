@@ -22,7 +22,8 @@ data_import <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|
         sep = "\t",
         header = F,
         skip = skiplines, 
-        nrows = nrow
+        nrows = nrow,
+        fill = TRUE
     ) %>% 
     dplyr::select(
         "sample" = V1, 

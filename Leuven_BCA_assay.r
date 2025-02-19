@@ -57,6 +57,7 @@ data_import <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|
             well
         )
     ) %>% 
+    arrange(as.numeric(known.conc)) %>% #this is incase the ordering in the original sheet is not sequential
     mutate(
         sample = rep(c(LETTERS[9:1]),times=c(rep(nstd,nstandards)))
     ) %>% 

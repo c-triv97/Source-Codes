@@ -57,8 +57,10 @@ data_import <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|
             well
         )
     ) %>% 
+    drop_na(known.conc) %>% # removing blanks 
+    arrange(as.numeric(known.conc)) %>% #this is incase the ordering in the original sheet is not sequential
     mutate(
-        sample = rep(c(LETTERS[9:1]),times=c(rep(nstd,nstandards)))
+        sample = rep(c(LETTERS[nstandards:1]),times=c(rep(nstd,nstandards)))
     ) %>% 
     group_by(
         sample, known.conc
@@ -76,7 +78,8 @@ data_import <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|
         !grepl(
             standard.wells, 
             well
-        )
+        ),
+        !corr.absorbance.550 < 0
     ) %>% 
     mutate(
         sample = rep(c(1:nsamples),times=c(rep(nspl,nsamples)))

@@ -43,3 +43,7 @@ multiplesheets <- function(fname) {
 
   return(data_frame) 
 } 
+
+# mixed order ordering function so that SPL1 to SPL20 is logically ordered by alphabet and then number
+require("gtools") 
+mixedrank = function(x) order(gtools::mixedorder(x))

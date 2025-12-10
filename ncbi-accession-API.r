@@ -4,6 +4,7 @@ library(taxize)
 
 # Set API key by logging to NCBI ####
 set_entrez_key("5d353264467978b2c10088ca2cd2b09adf08")
+
 # API-key rate limit: 10 requests/sec so delay = 0.1 sec ####
 REQUEST_DELAY <- 0.12   # buffer to be safe
 

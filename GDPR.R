@@ -47,3 +47,17 @@ multiplesheets <- function(fname) {
 # mixed order ordering function so that SPL1 to SPL20 is logically ordered by alphabet and then number
 require("gtools") 
 mixedrank = function(x) order(gtools::mixedorder(x))
+
+# group colours 
+require("colorspace")
+require("RColorBrewer") 
+# Function: generate replicate colors with variable replicates per group
+make_replicate_palette <- function(n_reps, base_colors = group_colors) {
+  n_groups <- length(n_reps)
+  pal_list <- vector("list", n_groups)
+  for (i in seq_len(n_groups)) {
+    pal_list[[i]] <- rev(colorRampPalette(c("white", base_colors[i]))(n_reps[i] + 1)[-1])
+  }
+  unlist(pal_list)
+}
+                   

@@ -27,6 +27,7 @@ wd <- function(file_path, sub){
   setwd(dir)
 }
 
+require("purrr")
 `%!in%` <- negate(`%in%`)
 
 # reading multiple excel sheets

@@ -181,6 +181,27 @@ myMAplot <- function(data, title) {
         return(plot)
 }
 
+myMAplot_unlabelled <- function(data, title) {
+        dat = as.data.frame(data)
+        
+        dat = dat %>% 
+        dplyr::mutate(sig = ifelse(padj <=.05, "TRUE", "FALSE"))
+
+        colors = c("FALSE" = "#636363", "TRUE" = "#1f78b4")
+
+        plot = ggplot(dat, 
+                  aes(x = baseMean, y = log2FoldChange, color = sig)) +
+            geom_point(alpha = 0.6, size = 3)+
+            geom_line(aes(y = 0), color = "black", linewidth = 2) +
+            scale_x_log10()+
+            theme_scientific+
+            scale_color_manual(values = colors) +
+            labs(subtitle = title,
+                 y = "Log Fold Change", 
+                 x = "Mean of Normalised Counts")
+        return(plot)
+}
+
 myVolcano <- function(dataframe, title, logcutoff, n=10) {
 
         dat = dataframe %>%

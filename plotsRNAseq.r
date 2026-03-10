@@ -110,7 +110,8 @@ pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadin
 
     top_loadings <- pc_loadings %>% 
                     filter(gene %in% top_genes) %>% 
-                    merge(annotation, by.x = "gene", by.y = "gene_id")
+                    merge(annotation, by.x = "gene", by.y = "gene_id") %>% 
+                    unique() # removes any duplicated rows, bug from analysis
                     
     loading_plot = ggplot(data = top_loadings) +
                     geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 

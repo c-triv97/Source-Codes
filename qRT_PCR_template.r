@@ -62,32 +62,31 @@ calc.dCt <- function(data,
 
     dat1 <- data %>% 
             mutate_if(is.character, as.factor) %>% 
-            mutate(dCt = {{gene.of.interest}}-{{housekeeper}}) #calculate normalised cycle threshold of gene of interest compared to housekeeper
+            mutate(dCt = .data[[gene.of.interest]]-.data[[housekeeper]]) #calculate normalised cycle threshold of gene of interest compared to housekeeper
     
     return(dat1)
 }
 
 calc.RQ <- function(data,
-                    grouping = group, 
+                    grouping, 
                     control = "control"){
 
-    cont.dCt <- subset(
-        data, {{group}} == control
-    ) %>%
-    pull("dCt") #pull the dCt values from the control group and use 
+    cont.dCt <- data %>%
+    filter(.data[[grouping]] == control) %>%
+    pull(dCt) #pull the dCt values from the control group and use 
 
-    dat1 <- data %>% 
-            group_by({{grouping}}) %>%
-            summarise(mean.dCt = mean(dCt), 
-                      sd.dCt = sd(dCt),
-                      sem.dCt = standard_error(dCt)) %>%
-            mutate(ddCt = mean.dCt - mean(cont.dCt)) %>%
+    if (length(cont.dCt) == 0) stop("No rows matched control = '", control, "' in column '", grouping, "'")
+  
+    data %>% 
+    group_by(.data[[grouping]]) %>%
+            summarise(mean.dCt = mean(dCt, na.rm = TRUE), 
+                      sd.dCt = sd(dCt, na.rm = TRUE),
+                      sem.dCt = standard_error(dCt),
+                     .groups  = "drop") %>%
+            mutate(ddCt = mean.dCt - mean(cont.dCt, na.rm = TRUE)) %>%
             mutate(RQ = 2^-(ddCt), 
                    RQ.max = 2^-(ddCt - sem.dCt),
                    RQ.min = 2^-(ddCt + sem.dCt))
-    
-    return(dat1)
-            
 }
 
 dummy_dat1 <- calc.dCt(data = dummy_dat, 

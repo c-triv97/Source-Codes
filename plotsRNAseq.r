@@ -26,22 +26,29 @@ tx2gene <- as.data.frame(txs) %>%
            relocate("tx_id_version", "gene_id") 
 
 
-pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadings"){ # info should be df with sample id and condition, anno is gene id matching dds plus common symbol, keep decides keeping loading plot or the PCA output object (for recreating any plot)
-    dds = dds 
+pca_full <- function(dat, trans = "rlog", title = "", info, anno, keep = c("loadings", "pca", "plot"), print_loadings = TRUE, pal = "Set2"){ # info should be df with sample id and condition, anno is gene id matching dds plus common symbol, keep decides keeping loading plot or the PCA output object (for recreating any plot) 
 
     colnames(info) = c("sample", "condition")
+
+    n_levels <- length(unique(info[["condition"]]))
+    plot_colours <- RColorBrewer::brewer.pal(n_levels, pal)
 
     gxs = as.data.frame(anno) # anno is a gene name to symbol conversion 
     colnames(gxs) = c("gene_id", "gene_name")
 
-    if (trans == "rlog"){
-        fit_dds = rlog(dds, fitType = "local")
+    if (class(dat)[1] == "DESeqDataSet"){
+      if (trans == "rlog"){
+        fit_dds = rlog(dat, fitType = "local")
+        pca_matrix = assay(fit_dds)
+      } else {
+        fit_dds = vst(dat, fitType = "local")
+        pca_matrix = assay(fit_dds)
+      }
     } else {
-        fit_dds = vst(dds, fitType = "local")
+      pca_matrix = dat
+      cat("Data input is assumed to be vsd/rlog transformed") 
     }
-
-    pca_matrix = assay(fit_dds)
-
+    
     pca = prcomp(t(pca_matrix),
                  center = TRUE,
                  scale = TRUE) #pca requires matrix with cols presrenting variables and rows representing samples 
@@ -75,17 +82,17 @@ pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadin
                  mutate(condition = info$condition, 
                         Sample = info$sample)
 
-    pca_plot = ggplot(pca_scores, aes(PC1, PC2, color = condition)) +
-               geom_point(size = 8, alpha = 0.5) +
+    pca_plot = ggplot(pca_scores, aes(PC1, PC2, fill = condition)) +
+               geom_point(size = 5, alpha = 0.5, pch = 21) +
                xlab(paste0("PC1: ", round(eigenvalues$pct[1], 2),"% variance")) +
                ylab(paste0("PC2: ", round(eigenvalues$pct[2], 2),"% variance")) +
-               geom_text_repel(aes(label = Sample), size = 8, show.legend = FALSE) +
+               geom_text_repel(aes(label = Sample), size = 5, show.legend = FALSE) +
                scale_y_continuous(guide = "prism_minor", limits = c(min(pca_scores$PC2), 
                                                                     max(pca_scores$PC2))) + 
                scale_x_continuous(guide = "prism_minor", limits = c(min(pca_scores$PC1), 
                                                                     max(pca_scores$PC1))) + 
-               theme_thesis +
-               scale_color_brewer(palette = "Dark2") +
+               theme_paper +
+               scale_fill_manual(values = plot_colours) +
                labs(subtitle = paste0("PCA Analysis", title, sep=""))
     
     print(pca_plot)
@@ -130,14 +137,21 @@ pca_full <- function(dds, trans = "rlog", title = "", info, anno, keep = "loadin
                         subtitle = paste0("PC loading plot", title, sep = ""))
     
     
-    print(loading_plot)
+    if (print_loadings == TRUE) {
+      print(loading_plot)
+      }
 
     if (keep == "loadings"){
         return(loading_plot)
-    } else {
+    } 
+    
+    if (keep == "pca"){
         return(pca)
-    }
+    } 
 
+    if (keep == "plot"){
+        return(pca_plot)
+    } 
 }
 ## MA Plots R
 myMAplot <- function(data, title) {

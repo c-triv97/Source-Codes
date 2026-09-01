@@ -98,6 +98,99 @@ data_import <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|
   return(data.list)
 }
 
+data_import_txt <- function(pat, skiplines = 141, path=getwd(), standard.wells = "A|B|C", nstd=3, nspl=3, nrow = 50){
+  
+    data.file = list.files(
+        pattern = pat,
+        recursive = T,
+        path = path
+    )
+    print(data.file)
+
+    dat = read.table( 
+        file = data.file,
+        sep = "\t",
+        header = TRUE,
+        skip = skiplines, 
+        nrows = nrow,
+        fill = TRUE
+    ) %>% 
+    janitor::clean_names() %>%
+    dplyr::rename(
+        absorbance.550 = x550
+    ) %>% 
+    mutate(
+        absorbance.550 = as.numeric(
+            str_replace(
+                absorbance.550,
+                ",", 
+                "."
+            )
+        )
+    )
+
+    blank = filter(dat, conc_dil == 0) %>% 
+    pull("absorbance.550")%>% 
+    mean()
+
+    dat = dat %>% 
+    mutate(corr.absorbance.550 = absorbance.550 - blank)
+
+    nstandards = length(grep(standard.wells, dat$well, value = FALSE))/nstd
+
+    standards = dat %>% 
+    filter(
+        grepl(
+            standard.wells, 
+            well
+        )
+    ) %>% 
+    drop_na(conc_dil) %>% # removing blanks 
+    arrange(as.numeric(conc_dil)) %>% #this is incase the ordering in the original sheet is not sequential
+    mutate(
+        sample = rep(c(LETTERS[nstandards:1]),times=c(rep(nstd,nstandards)))
+    ) %>% 
+    group_by(
+        sample, conc_dil
+    ) %>% 
+    summarise( 
+        mean.absorbance = mean(corr.absorbance.550), 
+        sd.absorbance = sd(corr.absorbance.550), 
+        replicates = n()
+    )
+
+    nsamples = sum(!grepl(standard.wells, dat$well))/nspl
+
+    print(nsamples)
+
+    unknowns = dat %>% 
+    filter(
+        !grepl(
+            standard.wells, 
+            well
+        )
+    ) %>% 
+    mutate(
+        sample = rep(c(1:nsamples),times=c(rep(nspl,nsamples))),
+        corr.absorbance.550 = case_when(
+            corr.absorbance.550 < 0 ~ NA, 
+            TRUE ~ corr.absorbance.550
+        )
+    ) %>% 
+    group_by(
+        sample
+    ) %>% 
+    summarise( 
+        mean.absorbance = mean(corr.absorbance.550, na.rm = TRUE), 
+        sd.absorbance = sd(corr.absorbance.550, na.rm = TRUE), 
+        replicates = n()
+    )
+
+    data.list = list(raw_data = dat, standards = standards, unknowns = unknowns)
+  
+  return(data.list)
+}
+
 fit2curve <- function(standards, unknowns, plt = TRUE){
 
     model <- drc::drm(

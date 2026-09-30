@@ -92,7 +92,7 @@ pca_full <- function(dat, trans = "rlog", title = "", info, anno, keep = c("load
                scale_x_continuous(guide = "prism_minor", limits = c(min(pca_scores$PC1), 
                                                                     max(pca_scores$PC1))) + 
                theme_paper +
-               scale_fill_manual(values = plot_colours) +
+               scale_fill_manual(values = plot_colours, name = "") +
                labs(subtitle = paste0("PCA Analysis", title, sep=""))
     
     print(pca_plot)

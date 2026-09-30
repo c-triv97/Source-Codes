@@ -34,4 +34,7 @@ theme_paper <-  theme_light(base_size = 18) + theme(
     strip.text = element_text(color = "black", size = 18, face = "bold.italic"),
     panel.border = element_blank(),
     axis.line = element_line(colour = "grey"),
-    panel.spacing = unit(2, "lines"))
+    panel.spacing = unit(2, "lines"),
+    legend.background = element_rect(fill = "transparent"),
+    legend.box.background = element_rect(fill = "transparent"),
+    legend.key = element_rect(fill = "transparent"))

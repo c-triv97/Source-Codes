@@ -36,5 +36,5 @@ theme_paper <-  theme_light(base_size = 18) + theme(
     axis.line = element_line(colour = "grey"),
     panel.spacing = unit(2, "lines"),
     legend.background = element_rect(fill = "transparent"),
-    legend.box.background = element_rect(fill = "transparent"),
+    legend.box.background = element_rect(fill = "transparent", color = NA),
     legend.key = element_rect(fill = "transparent"))

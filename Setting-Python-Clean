@@ -1,0 +1,23 @@
+setting up python 
+
+https://francesco-onorati.medium.com/another-clean-python-setup-on-macos-guide-cf82c8be6865
+
+USE STEPS...
+
+pyenv virtualenv 3.11.8 myproject
+pyenv activate myproject
+cd myproject
+
+poetry init
+poetry add numpy pandas scikit-learn
+poetry shell
+
+pyenv deactivate
+
+poetry add ipykernel
+poetry run python -m ipykernel install --user --name=myproject --display-name "Python (myproject)"
+
+Option A: VS Code
+Open your project folder in VS Code.
+Open Command Palette (Cmd+Shift+P) → Python: Select Interpreter → choose Python (myproject).
+When you open a Jupyter notebook, select the Python (myproject) kernel.

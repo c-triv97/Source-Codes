@@ -232,7 +232,12 @@ fit2curve <- function(standards, unknowns, plt = TRUE){
         scale_fill_discrete(name = "Sample ID")+
         scale_x_continuous(breaks = rev(standards$known.conc[-9]),
                            transform = "pseudo_log")+
-        guides(x = "axis_logticks")
+        guides(x = "axis_logticks", fill = "none")+
+        geom_text_repel(data = unknowns,
+                        aes(x = estimate,
+                            y = mean.absorbance, 
+                            label = sample),
+                        colour = "black")
 
         print(p)
         
